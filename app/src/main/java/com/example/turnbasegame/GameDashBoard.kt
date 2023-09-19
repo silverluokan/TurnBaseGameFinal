@@ -19,7 +19,7 @@ class GameDashBoard : AppCompatActivity(), View.OnClickListener {
     var PlayerFinalDamage = 0
     var EnemyFinalDamage = 0
     var EnemyDefense = 0
-    var EnemyName = ""
+    var EnemyName = "Find Enemy"
     var EnemyExp = 0
 
     var PlayerCurrentHp = 0
@@ -29,6 +29,9 @@ class GameDashBoard : AppCompatActivity(), View.OnClickListener {
     var PlayerDefense = 0
     var PlayerHeal = 0
     var PlayerStats = ""
+    val playerName = "Player"
+
+    var isGameOver = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +46,9 @@ class GameDashBoard : AppCompatActivity(), View.OnClickListener {
         PlayerDamage = player.Damage
         PlayerHeal = player.Heal
         PlayerDefense = player.DefensePoint
+        binding.textView4.text = playerName
+        binding.textView3.text = EnemyName
+        binding.enemyImage.setImageResource(R.drawable.qmark)
 
         binding.btnRoll.isEnabled = false
         binding.btnAttack.isEnabled = false
@@ -56,8 +62,6 @@ class GameDashBoard : AppCompatActivity(), View.OnClickListener {
         binding.btnHeal.setOnClickListener(this)
         binding.btnAgain.setOnClickListener(this)
     }
-
-
 
     fun EnemyDo(){
         val rand = (1..3).random()
@@ -129,6 +133,8 @@ class GameDashBoard : AppCompatActivity(), View.OnClickListener {
 
     fun FindEnemy(){
         val enemyFind = (1..3).random()
+        isGameOver = 0
+
         when(enemyFind){
             1->{
                 val enemy = Enemy_Bat()
@@ -143,6 +149,7 @@ class GameDashBoard : AppCompatActivity(), View.OnClickListener {
                 binding.txtEnemyHp.text = "$EnemyCurrentHp/${enemy.MaxHealthPoint}"
                 binding.enemyhp.progress = (EnemyCurrentHp/enemy.MaxHealthPoint)*100
                 binding.btnFindEnemy.isEnabled = false
+                binding.textView3.text = EnemyName
             }
             2->{
                 val enemy = Enemy_bslime()
@@ -157,6 +164,7 @@ class GameDashBoard : AppCompatActivity(), View.OnClickListener {
                 binding.txtEnemyHp.text = "$EnemyCurrentHp/${enemy.MaxHealthPoint}"
                 binding.enemyhp.progress = (EnemyCurrentHp/enemy.MaxHealthPoint)*100
                 binding.btnFindEnemy.isEnabled = false
+                binding.textView3.text = EnemyName
             }
             3->{
                 val enemy = Enemy_Rat()
@@ -171,6 +179,7 @@ class GameDashBoard : AppCompatActivity(), View.OnClickListener {
                 binding.txtEnemyHp.text = "$EnemyCurrentHp/${enemy.MaxHealthPoint}"
                 binding.enemyhp.progress = (EnemyCurrentHp/enemy.MaxHealthPoint)*100
                 binding.btnFindEnemy.isEnabled = false
+                binding.textView3.text = EnemyName
             }
         }
         binding.btnRoll.isEnabled = true
@@ -199,21 +208,29 @@ class GameDashBoard : AppCompatActivity(), View.OnClickListener {
                 PlayerStats = "Attack"
                 EnemyDo()
                 checker()
-                roll()
+                if (isGameOver == 0) {
+                    roll()
+                }
                 reprint()
+
             }
             (R.id.btnDefend)->{
                 PlayerStats = "Defend"
                 EnemyDo()
                 checker()
-                roll()
+                if (isGameOver == 0) {
+                    roll()
+                }
                 reprint()
             }
             (R.id.btnHeal)->{
                 PlayerStats = "Heal"
                 EnemyDo()
                 checker()
-                roll()
+                if (isGameOver == 0) {
+                    roll()
+
+                }
                 reprint()
             }
             (R.id.btnAgain)->{
@@ -237,17 +254,20 @@ class GameDashBoard : AppCompatActivity(), View.OnClickListener {
     }
     fun checker(){
         if(EnemyCurrentHp <= 0){
+            isGameOver = 1
+            death()
             binding.enemyImage.setImageResource(R.drawable.tomb)
-            binding.txtEnemyHp.text = "0/$EnemyMaxHp"
+            EnemyCurrentHp = 0
+            binding.txtEnemyHp.text = "$EnemyCurrentHp/$EnemyMaxHp"
             binding.enemyhp.progress = 0
-            death()
             binding.btnFindEnemy.isEnabled = true
-        }
-        if(PlayerCurrentHp <= 0){
-            binding.playerhp.progress = 0
-            binding.txtPlayerHp.text = "0/$playerMaxHp"
-            binding.playerImage.setImageResource(R.drawable.tomb)
+        } else if (PlayerCurrentHp <= 0) {
+            isGameOver = 1
             death()
+            binding.playerImage.setImageResource(R.drawable.tomb)
+            PlayerCurrentHp = 0
+            binding.txtPlayerHp.text = "$PlayerCurrentHp/$playerMaxHp"
+            binding.playerhp.progress = 0
             binding.btnAgain.visibility = View.VISIBLE
         }
     }
